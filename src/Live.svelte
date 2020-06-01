@@ -1,16 +1,20 @@
 <script>
   import { onMount, onDestroy } from "svelte";
   import { navigate } from "svelte-routing";
-  // import * as buffer from "buffer";
   import jwtDecode from "jwt-decode";
   import io from "socket.io-client";
   import moment from "moment";
   import { getContext } from "svelte";
   import { fly } from "svelte/transition";
-
   import Popup from "./Popup.svelte";
+  import Config from "./environments/config";
+
+  //service
+  import EntryService from "./service/entries";
 
   const { open } = getContext("simple-modal");
+  const AUTH_ID = Config.AUTH_ID;
+  const SOCKET_END_POINT = Config.SOCKET_END_POINT;
 
   let entries = [];
   let serverTime = 0;
@@ -30,7 +34,7 @@
     console.log("onMount is called");
 
     //check authentication
-    const idToken = localStorage.getItem("bloodstockauction_admin_id_token");
+    const idToken = localStorage.getItem(AUTH_ID);
     console.log("idToken : ", idToken);
     if (!idToken) {
       return navigate("/login", { replace: true });
@@ -45,14 +49,15 @@
       const isExpired = isTokenExpired(idToken);
       console.log("idToken expired : ", isTokenExpired(idToken));
       if (isExpired === true) {
-        localStorage.removeItem("bloodstockauction_admin_id_token");
+        localStorage.removeItem(AUTH_ID);
         return navigate("/login", { replace: true });
       }
 
+      //set Auth JWT token
       authToken = idToken;
 
       try {
-        const catalogueResult = await getCatalogue();
+        const catalogueResult = await EntryService.getCatalogue(authToken);
         console.log("getCatalogue result : ", catalogueResult);
 
         //getCatalogue success
@@ -72,11 +77,10 @@
         }
       } catch (error) {
         console.log(error);
-        localStorage.removeItem("bloodstockauction_admin_id_token");
+        localStorage.removeItem(AUTH_ID);
         return navigate("/login", { replace: true });
       }
     }
-    //init auction detail data.
   });
 
   onDestroy(() => {
@@ -92,7 +96,7 @@
     //init socket for auction
     if (!ioClient) {
       console.log("socket is openning");
-      ioClient = io.connect("https://bondi-dev.bloodstockauction.com");
+      ioClient = io.connect(SOCKET_END_POINT);
 
       ioClient.on("auction", msg => {
         // console.info(msg);
@@ -156,7 +160,11 @@
 
   async function getEntries(catalogueId) {
     try {
-      const getAuctionDataResult = await getAuctionData(catalogueId);
+      errorMessage = undefined;
+      const getAuctionDataResult = await EntryService.getAuctionData(
+        catalogueId,
+        authToken
+      );
       console.log("getAuctionDataResult result : ", getAuctionDataResult);
 
       if (
@@ -199,7 +207,10 @@
 
     let history = [];
 
-    const biddingHistoryResult = await getBiddingHistory(entryId);
+    const biddingHistoryResult = await EntryService.getBiddingHistory(
+      entryId,
+      authToken
+    );
     console.log("biddingHistoryResult result : ", biddingHistoryResult);
 
     //getCatalogue success
@@ -340,118 +351,11 @@
 
   function refreshAllEntries() {
     console.log("refreshAllEntries is called : ", catalogueId);
+    entries = [];
     if (catalogueId) {
       console.log("refreshAllEntries calls getEntries");
       return getEntries(catalogueId);
     }
-  }
-
-  async function getAuctionData(catalogueId) {
-    errorMessage = undefined;
-    const token = authToken;
-
-    let response = await fetch(
-      "https://bsa2-admin-backend-dev.bloodstockauction.com/common",
-      {
-        // TODO: test
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: `
-        query
-          {
-            getEntriesLatestBidsByCatalogueId( catalogueId: \"${catalogueId}\")
-            {
-              success
-              message
-              entry {
-                _id
-                category { _id name slug }
-                country_code
-                horse { name sire }
-                current_price
-                reserve_price
-                bid_count
-                bids { amount max_amount user username user_fullname bidder status date }
-                status
-                statuses { status date }
-                lot_index
-                is_reserve
-                vendor { _id username phone email name { firstname surname}}
-              }
-            }
-          }`
-      }
-    );
-
-    return response.json();
-  }
-
-  async function getCatalogue() {
-    const token = authToken;
-    console.log("Auth token : ", token);
-
-    let response = await fetch(
-      "https://bsa2-admin-backend-dev.bloodstockauction.com/common",
-      {
-        // TODO: test
-        method: "POST",
-
-        headers: new Headers({
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        }),
-
-        body: `
-        query
-          {
-            getCurrentCatalogue
-            {
-              success
-              message
-              catalogue { _id name close live country_code status result_confirm }
-            }
-          }`
-      }
-    );
-
-    return response.json();
-  }
-
-  async function getBiddingHistory(entryId) {
-    const token = authToken;
-    console.log("Auth token : ", token);
-
-    let response = await fetch(
-      "https://bsa2-admin-backend-dev.bloodstockauction.com/common",
-      {
-        // TODO: test
-        method: "POST",
-
-        headers: new Headers({
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        }),
-
-        body: `
-        query
-          {
-            getBiddingHistory( entryId: \"${entryId}\")
-            {
-              success
-              message
-              history { _id user username user_fullname status max_amount amount bidder status date }
-            }
-          }`
-      }
-    );
-
-    return response.json();
   }
 </script>
 

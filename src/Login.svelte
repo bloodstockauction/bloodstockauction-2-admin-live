@@ -1,6 +1,8 @@
 <script>
   import { onMount } from "svelte";
   import { navigate } from "svelte-routing";
+  import AuthService from "./service/auth";
+
   let email = "";
   let password = "";
   let result;
@@ -19,35 +21,10 @@
 
   async function login() {
     errorMessage = undefined;
-    console.log("login is called : ", email, password);
-    let response = await fetch(
-      "https://bsa2-admin-backend.bloodstockauction.com/public",
-      {
-        // TODO: test
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        },
-        body: `
-        query
-          {
-            login( email : \"${email}\", password : \"${password}\")
-            {
-              success
-              message
-              user_id
-              name
-              email
-              role
-              token
-            }
-          }`
-      }
-    );
 
-    const result = await response.json();
-    // result = JSON.stringify(json);
+    console.log("login is called : ", email, password);
+
+    const result = await AuthService.login(email, password);
     console.log("result : ", result);
 
     if (
