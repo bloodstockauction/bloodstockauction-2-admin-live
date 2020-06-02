@@ -280,6 +280,7 @@
       date.setUTCSeconds(decoded.exp);
       return date.valueOf() > new Date().valueOf();
     } catch (err) {
+      console.error("Token decode error : ", err);
       return false;
     }
   }
@@ -331,12 +332,15 @@
   }
 
   function tadaAnimation(lotIndex) {
-    console.log("buttonClick is called : ", lotIndex);
+    console.log("tadaAnimation is called : ", lotIndex);
     let priceElement = document.getElementById("price-" + lotIndex);
     priceElement.classList.add("tada");
 
     let bidElement = document.getElementById("bid-count-" + lotIndex);
     bidElement.classList.add("tada");
+
+    //play sound effect
+    playSoundEffect();
 
     let self = this;
     setTimeout(function() {
@@ -356,6 +360,11 @@
       console.log("refreshAllEntries calls getEntries");
       return getEntries(catalogueId);
     }
+  }
+
+  function playSoundEffect() {
+    var audio = new Audio("sound/coin_sound.mp3");
+    audio.play();
   }
 </script>
 
@@ -448,7 +457,6 @@
             </button>
           </div>
         </div>
-
       </div>
       <div class="panel-body">
         {#if entries && entries.length > 0}
@@ -476,7 +484,19 @@
                     </div>
                   </td>
                   <td>{entry.max_price}</td>
-                  <td>{entry.is_reserve ? entry.reserve_price : ''}</td>
+                  <td>
+                    {#if entry.is_reserve}
+                      {#if entry.reserve_price > entry.current_price}
+                        <span style="color: red;">{entry.reserve_price}</span>
+                      {:else}
+                        <span style="text-decoration: line-through;">
+                          {entry.reserve_price}
+                        </span>
+                      {/if}
+                    {/if}
+                    <!-- {entry.is_reserve ? entry.reserve_price : ''} -->
+                  </td>
+                  <!-- <td>{entry.is_reserve ? entry.reserve_price : ''}</td> -->
                   <td>{entry.highestUserName}</td>
                   <td class="tada black">
                     <div id={'bid-count-' + entry.lot_index} class="animated">
@@ -486,7 +506,10 @@
                   <td>
                     {getCountDownTime(Number(entry.end_time) - serverTime)}
                   </td>
-                  <td>{getStatusName(entry.status)}</td>
+                  <td
+                    style="font-weight: bold;color: {entry.status === 'S' ? 'red' : 'blue'}">
+                    {getStatusName(entry.status)}
+                  </td>
                   <td>
                     <button
                       class="btn btn-primary btn-sm"
@@ -496,7 +519,7 @@
                     <button
                       class="btn btn-warning btn-sm"
                       on:click={buttonClick(entry.lot_index)}>
-                      Refresh
+                      Effect
                     </button>
                   </td>
                 </tr>
