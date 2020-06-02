@@ -277,11 +277,19 @@
     try {
       const date = new Date(0);
       const decoded = jwtDecode(token);
+      console.log("isTokenExpired called Token decoded : ", decoded);
       date.setUTCSeconds(decoded.exp);
-      return date.valueOf() > new Date().valueOf();
+
+      console.log("isTokenExpired called decoded time : ", date.valueOf());
+      console.log(
+        "isTokenExpired called current time : ",
+        new Date().valueOf()
+      );
+
+      return date.valueOf() < new Date().valueOf();
     } catch (err) {
       console.error("Token decode error : ", err);
-      return false;
+      return true;
     }
   }
 
