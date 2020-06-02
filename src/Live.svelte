@@ -276,7 +276,7 @@
   function isTokenExpired(token) {
     try {
       const date = new Date(0);
-      const decoded = decode(token);
+      const decoded = jwtDecode(token);
       date.setUTCSeconds(decoded.exp);
       return date.valueOf() > new Date().valueOf();
     } catch (err) {
