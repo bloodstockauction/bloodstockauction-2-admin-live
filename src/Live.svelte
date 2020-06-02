@@ -245,7 +245,7 @@
   }
 
   async function updateEntryDetail(entryId, entryIndex) {
-    const biddingHistoryResult = await getBiddingHistory(entryId);
+    const biddingHistoryResult = await EntryService.getBiddingHistory(entryId);
     console.log("biddingHistoryResult result : ", biddingHistoryResult);
 
     //getCatalogue success
@@ -322,6 +322,8 @@
       return "Sold";
     } else if (status === "P") {
       return "Passed In";
+    } else if (status === "X") {
+      return "Withdrawn";
     } else {
       return "";
     }
@@ -385,6 +387,17 @@
     animation-duration: 1s;
     -webkit-animation-fill-mode: both;
     animation-fill-mode: both;
+  }
+  tr.strikeout td {
+    position: relative;
+  }
+  tr.strikeout td:before {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    border-bottom: 1px solid #111;
+    width: 100%;
   }
   @-webkit-keyframes tada {
     0% {
@@ -476,7 +489,7 @@
             </thead>
             <tbody>
               {#each entries as entry}
-                <tr>
+                <tr class={entry.status === 'X' ? 'strikeout' : ''}>
                   <td>{entry.lot_index}</td>
                   <td class="tada black">
                     <div id={'price-' + entry.lot_index} class="animated">
@@ -489,7 +502,8 @@
                       {#if entry.reserve_price > entry.current_price}
                         <span style="color: red;">{entry.reserve_price}</span>
                       {:else}
-                        <span style="text-decoration: line-through;">
+                        <span
+                          style="color: green;text-decoration: line-through;">
                           {entry.reserve_price}
                         </span>
                       {/if}
@@ -507,20 +521,20 @@
                     {getCountDownTime(Number(entry.end_time) - serverTime)}
                   </td>
                   <td
-                    style="font-weight: bold;color: {entry.status === 'S' ? 'red' : 'blue'}">
+                    style="font-weight: bold;color: {entry.status === 'S' || entry.status === 'X' ? 'red' : 'blue'}">
                     {getStatusName(entry.status)}
                   </td>
                   <td>
                     <button
-                      class="btn btn-primary btn-sm"
+                      class="btn btn-primary btn-xs"
                       on:click={showPopup(entry._id)}>
                       History
                     </button>
-                    <button
-                      class="btn btn-warning btn-sm"
+                    <!-- <button
+                      class="btn btn-warning btn-xs"
                       on:click={buttonClick(entry.lot_index)}>
                       Effect
-                    </button>
+                    </button> -->
                   </td>
                 </tr>
               {/each}
