@@ -31,6 +31,9 @@
   let closing = false;
   let closed = false;
 
+  //live history
+  let liveHistory;
+
   onMount(async () => {
     console.log("onMount is called");
 
@@ -142,6 +145,15 @@
           if (entryIndex > -1) {
             if (entries[entryIndex].current_price !== newEntry.current_price) {
               tadaAnimation(lotIndex);
+
+              //update live history
+              const newLiveHistory = {
+                lot: lotIndex,
+                prev_price: entries[entryIndex].current_price,
+                current_price: newEntry.current_price,
+                date: new Date()
+              };
+              addLiveHistory(newLiveHistory);
             }
 
             // console.log("updateEntry() : ", entries[entryIndex]);
@@ -150,7 +162,8 @@
             entries[entryIndex].end_time = newEntry.end_time;
             entries[entryIndex].status = newEntry.status;
 
-            updateEntryDetail(entries[entryIndex]._id, entryIndex);
+            //update entry data
+            updateEntryDetail(entries[entryIndex]._id, entryIndex, authToken);
           }
         }
       });
@@ -193,7 +206,7 @@
       const entry = entries[index];
       if (entry.bid_count > 0) {
         const lastBidding = entry.bids[entry.bids.length - 1];
-        console.info("Max bidding : ", entry.lot_index, lastBidding);
+        // console.log("Max bidding : ", entry.lot_index, lastBidding);
         entry.max_price = lastBidding.max_amount;
         entry.highestUserName = lastBidding.user_fullname;
       } else {
@@ -245,8 +258,11 @@
     }
   }
 
-  async function updateEntryDetail(entryId, entryIndex) {
-    const biddingHistoryResult = await EntryService.getBiddingHistory(entryId);
+  async function updateEntryDetail(entryId, entryIndex, authToken) {
+    const biddingHistoryResult = await EntryService.getBiddingHistory(
+      entryId,
+      authToken
+    );
     console.log("biddingHistoryResult result : ", biddingHistoryResult);
 
     //getCatalogue success
@@ -281,11 +297,11 @@
       console.log("isTokenExpired called Token decoded : ", decoded);
       date.setUTCSeconds(decoded.exp);
 
-      console.log("isTokenExpired called decoded time : ", date.valueOf());
-      console.log(
-        "isTokenExpired called current time : ",
-        new Date().valueOf()
-      );
+      // console.log("isTokenExpired called decoded time : ", date.valueOf());
+      // console.log(
+      //   "isTokenExpired called current time : ",
+      //   new Date().valueOf()
+      // );
 
       return date.valueOf() < new Date().valueOf();
     } catch (err) {
@@ -377,6 +393,11 @@
     var audio = new Audio("sound/coin_sound.mp3");
     audio.play();
   }
+
+  function addLiveHistory(newEntry) {
+    console.log("addLiveHistory called : ", newEntry);
+    liveHistory = newEntry;
+  }
 </script>
 
 <style>
@@ -465,7 +486,7 @@
 </style>
 
 <div class="container">
-  <History />
+  <History newliveHistory={liveHistory} />
   <div class="live-container">
     <div class="panel panel-default">
       <div class="time">
