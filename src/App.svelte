@@ -10,7 +10,7 @@
 
 <Modal>
   <Header />
-  <div class="container">
+  <div>
     <Router {url}>
       <!-- <nav>
       <Link to="/">Home</Link>

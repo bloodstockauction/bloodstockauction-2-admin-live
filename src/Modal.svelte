@@ -228,9 +228,9 @@
         on:introend={onOpened}
         on:outroend={onClosed}
         style={cssWindow}>
-        {#if state.closeButton}
+        <!-- {#if state.closeButton}
           <button on:click={close} class="close" />
-        {/if}
+        {/if} -->
         <div class="content" style={cssContent}>
           <svelte:component this={Component} {...props} />
         </div>

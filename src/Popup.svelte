@@ -9,7 +9,8 @@
     text-align: center;
   }
   .header {
-    background-color: #eee;
+    color: white;
+    background-color: #326fa8;
     font-weight: bold;
   }
 </style>

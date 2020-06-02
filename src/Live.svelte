@@ -77,8 +77,14 @@
           catalogueResult.data.getCurrentCatalogue &&
           catalogueResult.data.getCurrentCatalogue.success === true
         ) {
-          catalogueId =
-            catalogueResult.data.getCurrentCatalogue.catalogue[0]._id;
+          const currentCatalogue =
+            catalogueResult.data.getCurrentCatalogue.catalogue[0];
+
+          if (currentCatalogue.status !== "live") {
+            console.error("Catalogue is not Live");
+            return;
+          }
+          catalogueId = currentCatalogue._id;
           console.log("catalogueId : ", catalogueId);
 
           if (catalogueId) {
@@ -589,108 +595,116 @@
   }
 </style>
 
-<div class="container">
+<div>
   {#if entries && entries.length > 0}
     <History newliveHistory={liveHistory} on:message={scrollTo} />
-    <div class="live-container">
-      <div class="panel panel-default">
-        <div class="time">
-          <div>
-            {#if serverTime}
-              Time : {moment(serverTime).format('DD/MM/YYYY - h:mm:ss a')}
-            {/if}
-            <div class="float-right">
-              <button
-                class="btn btn-danger btn-sm"
-                on:click={refreshAllEntries}>
-                <!-- on:click={buttonAllRefreshClick()}> -->
-                All Refresh
-              </button>
+  {/if}
+  <div class="container">
+    {#if entries && entries.length > 0}
+      <!-- <History newliveHistory={liveHistory} on:message={scrollTo} /> -->
+      <div class="live-container">
+        <div class="panel panel-default">
+          <div class="time">
+            <div>
+              {#if serverTime}
+                Time : {moment(serverTime).format('DD/MM/YYYY - h:mm:ss a')}
+              {/if}
+              <div class="float-right">
+                <button
+                  class="btn btn-danger btn-sm"
+                  on:click={refreshAllEntries}>
+                  <!-- on:click={buttonAllRefreshClick()}> -->
+                  All Refresh
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="panel-body">
-          <table class="table table-striped admin">
-            <thead>
-              <tr>
-                <td>Lot</td>
-                <td>Price</td>
-                <td>Max Price</td>
-                <td>Reserve Price</td>
-                <td>Highest bidder</td>
-                <td>Bids</td>
-                <td>Time</td>
-                <td>Status</td>
-                <td>Actions</td>
-              </tr>
-            </thead>
-            <tbody>
-              {#each entries as entry}
-                <tr
-                  id={'lot' + entry.lot_index}
-                  class={entry.status === 'X' ? 'strikeout' : ''}>
-                  <td>{entry.lot_index}</td>
-                  <td class="tada black">
-                    <div id={'price-' + entry.lot_index} class="animated">
-                      {entry.current_price}
-                    </div>
-                  </td>
-                  <td>{entry.max_price}</td>
-                  <td>
-                    {#if entry.is_reserve}
-                      {#if entry.reserve_price > entry.current_price}
-                        <span style="color: red;">{entry.reserve_price}</span>
-                      {:else}
-                        <span
-                          style="color: green;text-decoration: line-through;">
-                          {entry.reserve_price}
-                        </span>
+          <div class="panel-body">
+            <table class="table table-striped admin">
+              <thead>
+                <tr>
+                  <td>Lot</td>
+                  <td>Price</td>
+                  <td>Max Price</td>
+                  <td>Reserve Price</td>
+                  <td>Highest bidder</td>
+                  <td>Bids</td>
+                  <td>Time</td>
+                  <td>Status</td>
+                  <td>Actions</td>
+                </tr>
+              </thead>
+              <tbody>
+                {#each entries as entry}
+                  <tr
+                    id={'lot' + entry.lot_index}
+                    class={entry.status === 'X' ? 'strikeout' : ''}>
+                    <td>{entry.lot_index}</td>
+                    <td class="tada black">
+                      <div id={'price-' + entry.lot_index} class="animated">
+                        {entry.current_price}
+                      </div>
+                    </td>
+                    <td>{entry.max_price}</td>
+                    <td>
+                      {#if entry.is_reserve}
+                        {#if entry.reserve_price > entry.current_price}
+                          <span style="color: red;">{entry.reserve_price}</span>
+                        {:else}
+                          <span
+                            style="color: green;text-decoration: line-through;">
+                            {entry.reserve_price}
+                          </span>
+                        {/if}
                       {/if}
-                    {/if}
-                    <!-- {entry.is_reserve ? entry.reserve_price : ''} -->
-                  </td>
-                  <!-- <td>{entry.is_reserve ? entry.reserve_price : ''}</td> -->
-                  <td>{entry.highestUserName}</td>
-                  <td class="tada black">
-                    <div id={'bid-count-' + entry.lot_index} class="animated">
-                      {entry.bid_count}
-                    </div>
-                  </td>
-                  <td>
-                    {getCountDownTime(Number(entry.end_time) - serverTime)}
-                  </td>
-                  <td
-                    style="font-weight: bold;color: {entry.status === 'S' || entry.status === 'X' ? 'red' : 'blue'}">
-                    {getStatusName(entry.status)}
-                  </td>
-                  <td>
-                    <button
-                      class="btn btn-primary btn-xs"
-                      on:click={showPopup(entry._id)}>
-                      History
-                    </button>
-                    <!-- <button
+                      <!-- {entry.is_reserve ? entry.reserve_price : ''} -->
+                    </td>
+                    <!-- <td>{entry.is_reserve ? entry.reserve_price : ''}</td> -->
+                    <td>{entry.highestUserName}</td>
+                    <td class="tada black">
+                      <div id={'bid-count-' + entry.lot_index} class="animated">
+                        {entry.bid_count}
+                      </div>
+                    </td>
+                    <td>
+                      {getCountDownTime(Number(entry.end_time) - serverTime)}
+                    </td>
+                    <td
+                      style="font-weight: bold;color: {entry.status === 'S' || entry.status === 'X' ? 'red' : 'blue'}">
+                      {getStatusName(entry.status)}
+                    </td>
+                    <td>
+                      <button
+                        class="btn btn-primary btn-xs"
+                        on:click={showPopup(entry._id)}>
+                        History
+                      </button>
+                      <!-- <button
                       class="btn btn-warning btn-xs"
                       on:click={buttonClick(entry.lot_index)}>
                       Effect
                     </button> -->
-                  </td>
-                </tr>
-              {/each}
-            </tbody>
-          </table>
+                    </td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
-  {:else}
-    <div style="margin: 200px;padding: 40px;text-align: center;">
-      <h1>Loading..</h1>
-    </div>
-  {/if}
+    {:else}
+      <div style="margin: 200px;padding: 40px;text-align: center;">
+        <h1>Loading..</h1>
+      </div>
+    {/if}
 
-  {#if showTopButton}
-    <a class="cd-top cd-is-visible" on:click={scrollToTop} style="z-index: 10;">
-      Top
-    </a>
-  {/if}
+    {#if showTopButton}
+      <a
+        class="cd-top cd-is-visible"
+        on:click={scrollToTop}
+        style="z-index: 10;">
+        Top
+      </a>
+    {/if}
+  </div>
 </div>
