@@ -34,8 +34,14 @@
   //live history
   let liveHistory;
 
+  //window scroll
+  let showTopButton = false;
+
   onMount(async () => {
     console.log("onMount is called");
+
+    //set window scroll
+    initWindowScrollButton();
 
     //check authentication
     const idToken = localStorage.getItem(AUTH_ID);
@@ -95,6 +101,17 @@
       ioClient.close();
     }
   });
+
+  function initWindowScrollButton() {
+    window.onscroll = function(ev) {
+      // console.log("onscroll is called : ", window.pageYOffset);
+      if (window.pageYOffset > 300) {
+        showTopButton = true;
+      } else {
+        showTopButton = false;
+      }
+    };
+  }
 
   function initSocket() {
     //init socket for auction
@@ -425,6 +442,10 @@
       }, 3000);
     }
   }
+
+  function scrollToTop() {
+    window.scroll(0, 0);
+  }
 </script>
 
 <style>
@@ -455,6 +476,62 @@
     left: 0;
     border-bottom: 1px solid #111;
     width: 100%;
+  }
+  .cd-top {
+    display: inline-block;
+    height: 40px;
+    width: 40px;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    /* image replacement properties */
+
+    overflow: hidden;
+    text-indent: 100%;
+    white-space: nowrap;
+    background: #3f5c8a url(/img/cd-top-arrow.svg) no-repeat center 50%;
+    visibility: hidden;
+    opacity: 0;
+    -webkit-transition: opacity 0.3s 0s, visibility 0s 0.3s;
+    -moz-transition: opacity 0.3s 0s, visibility 0s 0.3s;
+    transition: opacity 0.3s 0s, visibility 0s 0.3s;
+  }
+  .cd-top.cd-is-visible,
+  .cd-top.cd-fade-out,
+  .no-touch .cd-top:hover {
+    -webkit-transition: opacity 0.3s 0s, visibility 0s 0s;
+    -moz-transition: opacity 0.3s 0s, visibility 0s 0s;
+    transition: opacity 0.3s 0s, visibility 0s 0s;
+  }
+  .cd-top.cd-is-visible {
+    /* the button becomes visible */
+
+    visibility: visible;
+    opacity: 1;
+  }
+  .cd-top.cd-fade-out {
+    /* if the user keeps scrolling down, the button is out of focus and becomes less visible */
+
+    opacity: 0.5;
+  }
+  .no-touch .cd-top:hover {
+    background-color: #3f5c8a;
+    opacity: 1;
+  }
+  @media only screen and (min-width: 768px) {
+    .cd-top {
+      right: 20px;
+      bottom: 10px;
+    }
+  }
+  @media only screen and (min-width: 1024px) {
+    .cd-top {
+      height: 60px;
+      width: 60px;
+      right: 30px;
+      bottom: 10px;
+    }
   }
   @-webkit-keyframes tada {
     0% {
@@ -513,24 +590,26 @@
 </style>
 
 <div class="container">
-  <History newliveHistory={liveHistory} on:message={scrollTo} />
-  <div class="live-container">
-    <div class="panel panel-default">
-      <div class="time">
-        <div>
-          {#if serverTime}
-            Time : {moment(serverTime).format('DD/MM/YYYY - h:mm:ss a')}
-          {/if}
-          <div class="float-right">
-            <button class="btn btn-danger btn-sm" on:click={refreshAllEntries}>
-              <!-- on:click={buttonAllRefreshClick()}> -->
-              All Refresh
-            </button>
+  {#if entries && entries.length > 0}
+    <History newliveHistory={liveHistory} on:message={scrollTo} />
+    <div class="live-container">
+      <div class="panel panel-default">
+        <div class="time">
+          <div>
+            {#if serverTime}
+              Time : {moment(serverTime).format('DD/MM/YYYY - h:mm:ss a')}
+            {/if}
+            <div class="float-right">
+              <button
+                class="btn btn-danger btn-sm"
+                on:click={refreshAllEntries}>
+                <!-- on:click={buttonAllRefreshClick()}> -->
+                All Refresh
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="panel-body">
-        {#if entries && entries.length > 0}
+        <div class="panel-body">
           <table class="table table-striped admin">
             <thead>
               <tr>
@@ -600,10 +679,18 @@
               {/each}
             </tbody>
           </table>
-        {:else}
-          <h1>Loading..</h1>
-        {/if}
+        </div>
       </div>
     </div>
-  </div>
+  {:else}
+    <div style="margin: 200px;padding: 40px;text-align: center;">
+      <h1>Loading..</h1>
+    </div>
+  {/if}
+
+  {#if showTopButton}
+    <a class="cd-top cd-is-visible" on:click={scrollToTop} style="z-index: 10;">
+      Top
+    </a>
+  {/if}
 </div>
