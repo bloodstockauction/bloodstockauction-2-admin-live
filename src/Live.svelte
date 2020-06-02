@@ -8,6 +8,7 @@
   import { fly } from "svelte/transition";
   import Popup from "./Popup.svelte";
   import Config from "./environments/config";
+  import History from "./History.svelte";
 
   //service
   import EntryService from "./service/entries";
@@ -456,6 +457,7 @@
 </style>
 
 <div class="container">
+  <History />
   <div class="live-container">
     <div class="panel panel-default">
       <div class="time">
