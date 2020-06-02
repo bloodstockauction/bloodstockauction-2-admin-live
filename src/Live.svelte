@@ -398,6 +398,33 @@
     console.log("addLiveHistory called : ", newEntry);
     liveHistory = newEntry;
   }
+
+  function scrollTo(event) {
+    const lotNumber = event.detail.text;
+    console.log(lotNumber);
+
+    let el = document.getElementById("lot" + lotNumber);
+    // console.log(`scrolling el : `, el);
+    if (el) {
+      //set position
+      const height = el.offsetTop;
+      console.log(`scrolling height : `, height);
+      window.scroll(0, height);
+
+      //color change
+      let tdItems = el.getElementsByTagName("td");
+      for (let i = 0; i < tdItems.length; i++) {
+        tdItems[i].setAttribute("style", "background-color:#a3d3e3");
+      }
+
+      setTimeout(() => {
+        console.log(`setTimeout is called tdItems : `, tdItems);
+        for (let i = 0; i < tdItems.length; i++) {
+          tdItems[i].removeAttribute("style");
+        }
+      }, 3000);
+    }
+  }
 </script>
 
 <style>
@@ -486,7 +513,7 @@
 </style>
 
 <div class="container">
-  <History newliveHistory={liveHistory} />
+  <History newliveHistory={liveHistory} on:message={scrollTo} />
   <div class="live-container">
     <div class="panel panel-default">
       <div class="time">
@@ -520,7 +547,9 @@
             </thead>
             <tbody>
               {#each entries as entry}
-                <tr class={entry.status === 'X' ? 'strikeout' : ''}>
+                <tr
+                  id={'lot' + entry.lot_index}
+                  class={entry.status === 'X' ? 'strikeout' : ''}>
                   <td>{entry.lot_index}</td>
                   <td class="tada black">
                     <div id={'price-' + entry.lot_index} class="animated">

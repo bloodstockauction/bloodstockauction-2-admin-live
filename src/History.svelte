@@ -1,6 +1,16 @@
 <script>
   export let newliveHistory;
   import moment from "moment";
+  import { createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher();
+
+  function scrollTo(lotNumber) {
+    dispatch("message", {
+      text: lotNumber
+    });
+  }
+
   let liveHistories = [];
 
   $: {
@@ -33,6 +43,9 @@
     background-color: #dff0d8;
     border-color: #d6e9c6;
   }
+  .history-rows {
+    padding: 3px;
+  }
 </style>
 
 <div class="history-container">
@@ -48,10 +61,16 @@
       <div>
         {#if liveHistories && liveHistories.length > 0}
           {#each liveHistories as history}
-            <div>
+            <div class="history-rows">
               Lot#{history.lot} - {history.prev_price}
               <i class="fa fa-arrow-right" aria-hidden="true" />
-              {history.current_price} - {moment(history.date).format('DD/MM/YYYY - h:mm a')}
+              {history.current_price} ( {moment(history.date).format('DD/MM/YYYY - h:mm a')}
+              )
+              <button
+                class="btn btn-success btn-xs"
+                on:click={scrollTo(history.lot)}>
+                see
+              </button>
             </div>
           {/each}
         {:else}No records{/if}
