@@ -390,7 +390,7 @@
     bidElement.classList.add("tada");
 
     //play sound effect
-    playSoundEffect();
+    // playSoundEffect();
 
     let self = this;
     setTimeout(function() {
@@ -596,9 +596,9 @@
 </style>
 
 <div>
-  {#if entries && entries.length > 0}
+  <!-- {#if entries && entries.length > 0}
     <History newliveHistory={liveHistory} on:message={scrollTo} />
-  {/if}
+  {/if} -->
   <div class="container">
     {#if entries && entries.length > 0}
       <!-- <History newliveHistory={liveHistory} on:message={scrollTo} /> -->
