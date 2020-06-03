@@ -17,6 +17,7 @@
   const AUTH_ID = Config.AUTH_ID;
   const SOCKET_END_POINT = Config.SOCKET_END_POINT;
 
+  let infoMessage = "Loading..";
   let entries = [];
   let serverTime = 0;
   let ioClient;
@@ -82,6 +83,7 @@
 
           if (currentCatalogue.status !== "live") {
             console.error("Catalogue is not Live");
+            infoMessage = "Sorry, catalogue is not live now";
             return;
           }
           catalogueId = currentCatalogue._id;
@@ -694,12 +696,16 @@
       </div>
     {:else}
       <div style="margin: 200px;padding: 40px;text-align: center;">
-        <h1>Loading..</h1>
+        <h1>
+          <b>{infoMessage}</b>
+        </h1>
       </div>
     {/if}
 
     {#if showTopButton}
       <a
+        href="#"
+        role="button"
         class="cd-top cd-is-visible"
         on:click={scrollToTop}
         style="z-index: 10;">
