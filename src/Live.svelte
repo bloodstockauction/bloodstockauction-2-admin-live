@@ -669,18 +669,26 @@
                       </div>
                     </td>
                     <td>
-                      {getCountDownTime(Number(entry.end_time) - serverTime)}
+                      {#if entry.status !== 'X'}
+                        {getCountDownTime(Number(entry.end_time) - serverTime)}
+                      {/if}
                     </td>
                     <td
                       style="font-weight: bold;color: {entry.status === 'S' || entry.status === 'X' ? 'red' : 'blue'}">
                       {getStatusName(entry.status)}
                     </td>
                     <td>
-                      <button
-                        class="btn btn-primary btn-xs"
-                        on:click={showPopup(entry._id)}>
-                        History
-                      </button>
+                      {#if entry.bid_count > 0}
+                        <button
+                          class="btn btn-primary btn-xs"
+                          on:click={showPopup(entry._id)}>
+                          History
+                        </button>
+                      {:else}
+                        <button class="btn btn-primary btn-xs" disabled>
+                          History
+                        </button>
+                      {/if}
                       <!-- <button
                       class="btn btn-warning btn-xs"
                       on:click={buttonClick(entry.lot_index)}>
