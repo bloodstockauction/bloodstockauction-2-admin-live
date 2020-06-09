@@ -118,14 +118,15 @@
   });
 
   function initWindowScrollButton() {
-    window.onscroll = function(ev) {
-      // console.log("onscroll is called : ", window.pageYOffset);
+    console.log("initWindowScrollButton is called");
+    window.addEventListener("scroll", function() {
+      console.log("onscroll is called : ", window.pageYOffset);
       if (window.pageYOffset > 300) {
         showTopButton = true;
       } else {
         showTopButton = false;
       }
-    };
+    });
   }
 
   function initSocket() {
