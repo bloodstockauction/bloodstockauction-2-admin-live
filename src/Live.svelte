@@ -176,6 +176,7 @@
           console.log("updateEntry() entryIndex", entryIndex);
 
           if (entryIndex > -1) {
+            let isUpdateSalesStatics = false;
             if (entries[entryIndex].current_price !== newEntry.current_price) {
               tadaAnimation(lotIndex);
 
@@ -187,6 +188,8 @@
                 date: new Date()
               };
               addLiveHistory(newLiveHistory);
+              //set to update sales statics
+              isUpdateSalesStatics = true;
             }
 
             // console.log("updateEntry() : ", entries[entryIndex]);
@@ -197,6 +200,11 @@
 
             //update entry data
             updateEntryDetail(entries[entryIndex]._id, entryIndex, authToken);
+
+            //update sales statics
+            if (isUpdateSalesStatics) {
+              initSalesStatics(entries);
+            }
           }
         }
       });
@@ -253,6 +261,7 @@
   }
 
   function initSalesStatics(allEntries) {
+    console.log("initSalesStatics is called : ", allEntries);
     soldLots = [];
     unSoldLots = [];
     withdrawnLots = [];
@@ -263,7 +272,7 @@
       if (entry.status === "X") {
         withdrawnLots.push(entry);
       } else {
-        if (entry.is_reserve == true) {
+        if (entry.is_reserve === true) {
           if (
             entry.current_price >= entry.reserve_price ||
             entry.status === "S"
