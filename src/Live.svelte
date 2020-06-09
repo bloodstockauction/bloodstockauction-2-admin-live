@@ -120,7 +120,7 @@
   function initWindowScrollButton() {
     console.log("initWindowScrollButton is called");
     window.addEventListener("scroll", function() {
-      console.log("onscroll is called : ", window.pageYOffset);
+      // console.log("onscroll is called : ", window.pageYOffset);
       if (window.pageYOffset > 300) {
         showTopButton = true;
       } else {
@@ -246,18 +246,46 @@
     for (let index = 0; index < entries.length; index++) {
       const entry = entries[index];
       if (entry.bid_count > 0) {
+        // console.log("entry bids : ", entry.bids);
         const lastBidding = entry.bids[entry.bids.length - 1];
         // console.log("Max bidding : ", entry.lot_index, lastBidding);
         entry.max_price = lastBidding.max_amount;
         entry.highestUserName = lastBidding.user_fullname;
 
-        //init sales static
-        initSalesStatics(entries);
+        let highestBidderList = [];
+
+        const bidHistory = entry.bids.reverse();
+        highestBidderList = getUnique(bidHistory, "user");
+
+        //splics top 3 only
+        highestBidderList = highestBidderList.slice(0, 3);
+        // console.log("highestBidderList : ", highestBidderList);
+
+        entry.highestBidderList = highestBidderList;
       } else {
         entry.max_price = 500;
         entry.highestUserName = "";
+        entry.highestBidderList = [];
       }
     }
+
+    //init sales static
+    initSalesStatics(entries);
+  }
+
+  function getUnique(arr, comp) {
+    // store the comparison  values in array
+    const unique = arr
+      .map(e => e[comp])
+
+      // store the indexes of the unique objects
+      .map((e, i, final) => final.indexOf(e) === i && i)
+
+      // eliminate the false indexes & return unique objects
+      .filter(e => arr[e])
+      .map(e => arr[e]);
+
+    return unique;
   }
 
   function initSalesStatics(allEntries) {
@@ -337,6 +365,16 @@
 
           entries[entryIndex].max_price = lastBidding.max_amount;
           entries[entryIndex].highestUserName = lastBidding.user_fullname;
+
+          //update top 3 bidder information
+          let highestBidderList = [];
+          highestBidderList = getUnique(history, "user");
+
+          //splics top 3 only
+          highestBidderList = highestBidderList.slice(0, 3);
+          // console.log("highestBidderList : ", highestBidderList);
+
+          entries[entryIndex].highestBidderList = highestBidderList;
         }
       }
       open(Popup, { bids: history });
@@ -370,6 +408,16 @@
         );
         entries[entryIndex].max_price = lastBidding.max_amount;
         entries[entryIndex].highestUserName = lastBidding.user_fullname;
+
+        //update top 3 bidder information
+        let highestBidderList = [];
+        highestBidderList = getUnique(history, "user");
+
+        //splics top 3 only
+        highestBidderList = highestBidderList.slice(0, 3);
+        // console.log("highestBidderList : ", highestBidderList);
+
+        entries[entryIndex].highestBidderList = highestBidderList;
       }
       // open(Popup, { bids: history });
     }
@@ -513,6 +561,18 @@
 
   function scrollToTop() {
     window.scroll(0, 0);
+  }
+
+  function getBidderPosition(index) {
+    if (index === 0) {
+      return "1st";
+    } else if (index === 1) {
+      return "2nd";
+    } else if (index === 2) {
+      return "3rd";
+    } else {
+      return "";
+    }
   }
 </script>
 
@@ -759,7 +819,15 @@
                       <!-- {entry.is_reserve ? entry.reserve_price : ''} -->
                     </td>
                     <!-- <td>{entry.is_reserve ? entry.reserve_price : ''}</td> -->
-                    <td>{entry.highestUserName}</td>
+                    <td>
+                      <!-- {entry.highestUserName} -->
+                      {#each entry.highestBidderList as bidder, index}
+                        <div style="font-size: {index === 0 ? '14px' : '11px'}">
+                          <span>{getBidderPosition(index)}</span>
+                          {bidder.user_fullname} - {bidder.max_amount}
+                        </div>
+                      {/each}
+                    </td>
                     <td class="tada black">
                       <div id={'bid-count-' + entry.lot_index} class="animated">
                         {entry.bid_count}
