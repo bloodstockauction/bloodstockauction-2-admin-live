@@ -9,6 +9,7 @@
   import Popup from "./Popup.svelte";
   import Config from "./environments/config";
   import History from "./History.svelte";
+  import Statics from "./Statics.svelte";
 
   //service
   import EntryService from "./service/entries";
@@ -37,6 +38,12 @@
 
   //window scroll
   let showTopButton = false;
+
+  //sales statics
+  let totalProfit = 0;
+  let soldLots = [];
+  let unSoldLots = [];
+  let withdrawnLots = [];
 
   onMount(async () => {
     console.log("onMount is called");
@@ -234,11 +241,54 @@
         // console.log("Max bidding : ", entry.lot_index, lastBidding);
         entry.max_price = lastBidding.max_amount;
         entry.highestUserName = lastBidding.user_fullname;
+
+        //init sales static
+        initSalesStatics(entries);
       } else {
         entry.max_price = 500;
         entry.highestUserName = "";
       }
     }
+  }
+
+  function initSalesStatics(allEntries) {
+    soldLots = [];
+    unSoldLots = [];
+    withdrawnLots = [];
+
+    for (let index = 0; index < allEntries.length; index++) {
+      let entry = allEntries[index];
+
+      if (entry.status === "X") {
+        withdrawnLots.push(entry);
+      } else {
+        if (entry.is_reserve == true) {
+          if (
+            entry.current_price >= entry.reserve_price ||
+            entry.status === "S"
+          ) {
+            soldLots.push(entry);
+          } else {
+            unSoldLots.push(entry);
+          }
+        } else {
+          if (entry.current_price > 500 || entry.status === "S") {
+            soldLots.push(entry);
+          } else {
+            unSoldLots.push(entry);
+          }
+        }
+      }
+    }
+
+    totalProfit = soldLots.reduce(function(sum, entry) {
+      return sum + entry.current_price;
+    }, 0);
+
+    console.log("soldLots : ", soldLots);
+    console.log("unSoldLots : ", unSoldLots);
+    console.log("withdrawnLots : ", withdrawnLots);
+    console.log("totalProfit : ", totalProfit);
   }
 
   async function showPopup(entryId) {
@@ -527,6 +577,7 @@
     background-color: #3f5c8a;
     opacity: 1;
   }
+
   @media only screen and (min-width: 768px) {
     .cd-top {
       right: 20px;
@@ -606,6 +657,12 @@
       <!-- <History newliveHistory={liveHistory} on:message={scrollTo} /> -->
       <div class="live-container">
         <div class="panel panel-default">
+          <Statics
+            {totalProfit}
+            allLots={entries.length}
+            soldLots={soldLots.length}
+            unSoldLots={unSoldLots.length}
+            withdrawnLots={withdrawnLots.length} />
           <div class="time">
             <div>
               {#if serverTime}
