@@ -716,6 +716,10 @@
   .black {
     color: black;
   }
+  .small-button {
+    padding: 2px 3px;
+    font-size: 9px !important;
+  }
 </style>
 
 <div>
@@ -724,7 +728,6 @@
   {/if}
   <div class="container">
     {#if entries && entries.length > 0}
-      <!-- <History newliveHistory={liveHistory} on:message={scrollTo} /> -->
       <div class="live-container">
         <div class="panel panel-default">
           <Statics
@@ -803,7 +806,6 @@
                       {:else}
                         <span style="color: red;">{entry.max_price}</span>
                       {/if}
-                      <!-- {entry.max_price} -->
                     </td>
                     <td>
                       {#if entry.is_reserve}
@@ -816,14 +818,16 @@
                           </span>
                         {/if}
                       {/if}
-                      <!-- {entry.is_reserve ? entry.reserve_price : ''} -->
                     </td>
-                    <!-- <td>{entry.is_reserve ? entry.reserve_price : ''}</td> -->
                     <td>
-                      <!-- {entry.highestUserName} -->
                       {#each entry.highestBidderList as bidder, index}
-                        <div style="font-size: {index === 0 ? '14px' : '11px'}">
-                          <span>{getBidderPosition(index)}</span>
+                        <div
+                          style="padding: 1px; font-size: {index === 0 ? '14px' : '11px'}">
+                          <span>
+                            <button class="btn btn-primary btn-xs small-button">
+                              {getBidderPosition(index)}
+                            </button>
+                          </span>
                           {bidder.user_fullname} - {bidder.max_amount}
                         </div>
                       {/each}
