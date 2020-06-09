@@ -50,7 +50,7 @@
 
     // Add the sticky class to the header when you reach its scroll position. Remove "sticky" when you leave the scroll position
     function setHistoryScroll() {
-      console.log("setHistoryScroll is called");
+      // console.log("setHistoryScroll is called");
       if (window.pageYOffset > sticky) {
         header.classList.add("sticky");
       } else {
@@ -93,7 +93,7 @@
   <div>
     {#if isShowHistory}
       <div class="history-title">
-        LIVE bidding histories for ALL lots ( Max : {maxHistories}
+        LIVE Bidding Logs ( Max : {maxHistories}
         <span style="padding: 0 10px;">
           <input type="range" bind:value={maxHistories} min="1" max="10" />
         </span>
@@ -116,7 +116,7 @@
               <button
                 class="btn btn-success btn-xs"
                 on:click={scrollTo(history.lot)}>
-                see
+                view
               </button>
             </div>
           {/each}
@@ -124,7 +124,7 @@
       </div>
     {:else}
       <div class="history-title">
-        LIVE bidding histories for ALL lots
+        LIVE Bidding Logs
         <div class="float-right">
           <a on:click={setShowHistory}>
             <i class="fa fa-arrow-circle-down fa-lg" />
