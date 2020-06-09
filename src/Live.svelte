@@ -717,8 +717,26 @@
     color: black;
   }
   .small-button {
+    border-radius: 4px;
     padding: 2px 3px;
     font-size: 9px !important;
+  }
+  .gold {
+    background-color: #ffd700 !important;
+  }
+  .silver {
+    background-color: #a9a9a9 !important;
+  }
+  .bronze {
+    background-color: #d28c47 !important;
+  }
+  .admin thead tr {
+    font-size: 15px;
+    background-color: #3f5c8a;
+    color: white;
+  }
+  .left-align {
+    text-align: left;
   }
 </style>
 
@@ -759,7 +777,7 @@
                   <td>Price</td>
                   <td>Max Price</td>
                   <td>Reserve Price</td>
-                  <td>Highest bidder</td>
+                  <td class="left-align">Highest bidders</td>
                   <td>Bids</td>
                   <td>Time</td>
                   <td>Status</td>
@@ -819,12 +837,13 @@
                         {/if}
                       {/if}
                     </td>
-                    <td>
+                    <td class="left-align">
                       {#each entry.highestBidderList as bidder, index}
                         <div
                           style="padding: 1px; font-size: {index === 0 ? '14px' : '11px'}">
                           <span>
-                            <button class="btn btn-primary btn-xs small-button">
+                            <button
+                              class="btn btn-primary btn-xs small-button {index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze'}">
                               {getBidderPosition(index)}
                             </button>
                           </span>
@@ -859,10 +878,10 @@
                         </button>
                       {/if}
                       <!-- <button
-                      class="btn btn-warning btn-xs"
-                      on:click={buttonClick(entry.lot_index)}>
-                      Effect
-                    </button> -->
+                        class="btn btn-warning btn-xs"
+                        on:click={buttonClick(entry.lot_index)}>
+                        Effect
+                      </button> -->
                     </td>
                   </tr>
                 {/each}
