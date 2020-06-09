@@ -12,20 +12,29 @@
     });
   }
 
+  let allHistories = [];
   let liveHistories = [];
   let maxHistories = 5;
 
   $: {
     if (newliveHistory) {
-      // console.log("liveHistories changed", newliveHistory);
-      // liveHistories.push(newliveHistory);
-      liveHistories = [...liveHistories, newliveHistory];
-      while (liveHistories && liveHistories.length > maxHistories) {
-        liveHistories.shift();
+      console.log("liveHistories changed", newliveHistory);
+      allHistories.push(newliveHistory);
+
+      //save maximum 10 bidding logs
+      while (allHistories && allHistories.length > 10) {
+        allHistories.shift();
       }
-      console.log("liveHistories : ", liveHistories);
-      newliveHistory = undefined;
     }
+
+    liveHistories = [...allHistories];
+
+    //set max live logs for user's setting'
+    while (liveHistories && liveHistories.length > maxHistories) {
+      liveHistories.shift();
+    }
+    console.log("liveHistories : ", liveHistories);
+    newliveHistory = undefined;
   }
 
   let isShowHistory = false;
