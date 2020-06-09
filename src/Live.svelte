@@ -644,10 +644,40 @@
                     <td>{entry.lot_index}</td>
                     <td class="tada black">
                       <div id={'price-' + entry.lot_index} class="animated">
-                        {entry.current_price}
+                        {#if entry.is_reserve}
+                          {#if entry.reserve_price <= entry.current_price}
+                            <span style="color: green;">
+                              {entry.current_price}
+                            </span>
+                          {:else}
+                            <span style="color: red;">
+                              {entry.current_price}
+                            </span>
+                          {/if}
+                        {:else if entry.bid_count > 0}
+                          <span style="color: green;">
+                            {entry.current_price}
+                          </span>
+                        {:else}
+                          <span style="color: red;">{entry.current_price}</span>
+                        {/if}
+                        <!-- {entry.current_price} -->
                       </div>
                     </td>
-                    <td>{entry.max_price}</td>
+                    <td>
+                      {#if entry.is_reserve}
+                        {#if entry.reserve_price <= entry.current_price}
+                          <span style="color: green;">{entry.max_price}</span>
+                        {:else}
+                          <span style="color: red;">{entry.max_price}</span>
+                        {/if}
+                      {:else if entry.bid_count > 0}
+                        <span style="color: green;">{entry.max_price}</span>
+                      {:else}
+                        <span style="color: red;">{entry.max_price}</span>
+                      {/if}
+                      <!-- {entry.max_price} -->
+                    </td>
                     <td>
                       {#if entry.is_reserve}
                         {#if entry.reserve_price > entry.current_price}
