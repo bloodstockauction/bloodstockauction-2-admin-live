@@ -900,7 +900,6 @@
 
     {#if showTopButton}
       <a
-        href="#"
         role="button"
         class="cd-top cd-is-visible"
         on:click={scrollToTop}
