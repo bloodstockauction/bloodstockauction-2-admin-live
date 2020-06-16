@@ -214,6 +214,13 @@
   }
 
   async function getEntries(catalogueId) {
+    const isExpired = isTokenExpired(authToken);
+    console.log("idToken expired : ", isTokenExpired(authToken));
+    if (isExpired === true) {
+      localStorage.removeItem(AUTH_ID);
+      return navigate("/login", { replace: true });
+    }
+
     try {
       errorMessage = undefined;
       const getAuctionDataResult = await EntryService.getAuctionData(
@@ -332,6 +339,13 @@
   async function showPopup(entryId) {
     console.log("showPopup is called : ", entryId);
 
+    const isExpired = isTokenExpired(authToken);
+    console.log("idToken expired : ", isTokenExpired(authToken));
+    if (isExpired === true) {
+      localStorage.removeItem(AUTH_ID);
+      return navigate("/login", { replace: true });
+    }
+
     let history = [];
 
     const biddingHistoryResult = await EntryService.getBiddingHistory(
@@ -382,6 +396,13 @@
   }
 
   async function updateEntryDetail(entryId, entryIndex, authToken) {
+    const isExpired = isTokenExpired(authToken);
+    console.log("idToken expired : ", isTokenExpired(authToken));
+    if (isExpired === true) {
+      localStorage.removeItem(AUTH_ID);
+      return navigate("/login", { replace: true });
+    }
+
     const biddingHistoryResult = await EntryService.getBiddingHistory(
       entryId,
       authToken
