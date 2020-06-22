@@ -45,6 +45,9 @@
   let unSoldLots = [];
   let withdrawnLots = [];
 
+  //filtering
+  let filterType = "all";
+
   onMount(async () => {
     console.log("onMount is called");
 
@@ -201,6 +204,9 @@
             //update entry data
             updateEntryDetail(entries[entryIndex]._id, entryIndex, authToken);
 
+            //update current status and background color
+            setCurrentStatus(entries[entryIndex]);
+
             //update sales statics
             if (isUpdateSalesStatics) {
               initSalesStatics(entries);
@@ -269,6 +275,8 @@
         // console.log("highestBidderList : ", highestBidderList);
 
         entry.highestBidderList = highestBidderList;
+
+        setCurrentStatus(entry);
       } else {
         entry.max_price = 500;
         entry.highestUserName = "";
@@ -515,10 +523,14 @@
   function tadaAnimation(lotIndex) {
     console.log("tadaAnimation is called : ", lotIndex);
     let priceElement = document.getElementById("price-" + lotIndex);
-    priceElement.classList.add("tada");
+    if (priceElement) {
+      priceElement.classList.add("tada");
+    }
 
     let bidElement = document.getElementById("bid-count-" + lotIndex);
-    bidElement.classList.add("tada");
+    if (bidElement) {
+      bidElement.classList.add("tada");
+    }
 
     //play sound effect
     playSoundEffect();
@@ -594,6 +606,28 @@
     } else {
       return "";
     }
+  }
+
+  function setCurrentStatus(entry) {
+    console.log("setCurrentStatus is called : ", entry);
+
+    if (entry.is_reserve) {
+      if (entry.reserve_price <= entry.current_price) {
+        entry.current_status = "sold";
+      } else {
+        entry.current_status = "unSold";
+      }
+    } else {
+      if (entry.bid_count > 0) {
+        entry.current_status = "sold";
+      }
+    }
+  }
+
+  function setFilter(Type) {
+    console.log("setFilter is called : ", Type);
+    filterType = Type;
+    console.log("new filter type : ", filterType);
   }
 </script>
 
@@ -759,6 +793,13 @@
   .left-align {
     text-align: left;
   }
+  .sold {
+    background-color: #ecfae6;
+  }
+  .unSold {
+    background-color: #f76d6a;
+    color: white;
+  }
 </style>
 
 <div>
@@ -790,6 +831,31 @@
               </div>
             </div>
           </div>
+          <div>
+            <ul class="nav nav-tabs justify-content-end">
+              <li class="nav-item">
+                <a
+                  class={filterType === 'all' ? 'nav-link active' : 'nav-link'}
+                  on:click={() => setFilter('all')}>
+                  All
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class={filterType === 'unSold' ? 'nav-link active' : 'nav-link'}
+                  on:click={() => setFilter('unSold')}>
+                  Unsold
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class={filterType === 'sold' ? 'nav-link active' : 'nav-link'}
+                  on:click={() => setFilter('sold')}>
+                  Sold
+                </a>
+              </li>
+            </ul>
+          </div>
           <div class="panel-body">
             <table class="table table-striped admin">
               <thead>
@@ -807,104 +873,92 @@
               </thead>
               <tbody>
                 {#each entries as entry}
-                  <tr
-                    id={'lot' + entry.lot_index}
-                    class={entry.status === 'X' ? 'strikeout' : ''}>
-                    <td>{entry.lot_index}</td>
-                    <td class="tada black">
-                      <div id={'price-' + entry.lot_index} class="animated">
+                  {#if filterType === 'all' || entry.current_status === filterType}
+                    <tr
+                      id={'lot' + entry.lot_index}
+                      class={entry.status === 'X' ? 'strikeout' : ''}>
+                      <td
+                        class={entry.current_status === 'sold' ? 'sold' : 'unSold'}>
+                        {entry.lot_index}
+                      </td>
+                      <td
+                        class={entry.current_status === 'sold' ? 'tada black sold' : 'tada black unSold'}>
+                        <div id={'price-' + entry.lot_index} class="animated">
+                          {entry.current_price}
+                        </div>
+                      </td>
+                      <td
+                        class={entry.current_status === 'sold' ? 'sold' : 'unSold'}>
+                        {entry.max_price}
+                      </td>
+                      <td
+                        class={entry.current_status === 'sold' ? 'sold' : 'unSold'}>
                         {#if entry.is_reserve}
-                          {#if entry.reserve_price <= entry.current_price}
-                            <span style="color: green;">
-                              {entry.current_price}
-                            </span>
+                          {#if entry.reserve_price > entry.current_price}
+                            <span>{entry.reserve_price}</span>
                           {:else}
-                            <span style="color: red;">
-                              {entry.current_price}
+                            <span
+                              style="color: green;text-decoration: line-through;">
+                              {entry.reserve_price}
                             </span>
                           {/if}
-                        {:else if entry.bid_count > 0}
-                          <span style="color: green;">
-                            {entry.current_price}
-                          </span>
-                        {:else}
-                          <span style="color: red;">{entry.current_price}</span>
                         {/if}
-                        <!-- {entry.current_price} -->
-                      </div>
-                    </td>
-                    <td>
-                      {#if entry.is_reserve}
-                        {#if entry.reserve_price <= entry.current_price}
-                          <span style="color: green;">{entry.max_price}</span>
-                        {:else}
-                          <span style="color: red;">{entry.max_price}</span>
-                        {/if}
-                      {:else if entry.bid_count > 0}
-                        <span style="color: green;">{entry.max_price}</span>
-                      {:else}
-                        <span style="color: red;">{entry.max_price}</span>
-                      {/if}
-                    </td>
-                    <td>
-                      {#if entry.is_reserve}
-                        {#if entry.reserve_price > entry.current_price}
-                          <span style="color: red;">{entry.reserve_price}</span>
-                        {:else}
-                          <span
-                            style="color: green;text-decoration: line-through;">
-                            {entry.reserve_price}
-                          </span>
-                        {/if}
-                      {/if}
-                    </td>
-                    <td class="left-align">
-                      {#each entry.highestBidderList as bidder, index}
+                      </td>
+                      <td
+                        class={entry.current_status === 'sold' ? 'left-align sold' : 'left-align unSold'}>
+                        {#each entry.highestBidderList as bidder, index}
+                          <div
+                            style="padding: 1px; font-size: {index === 0 ? '14px' : '11px'}">
+                            <span>
+                              <button
+                                class="btn btn-primary btn-xs small-button {index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze'}">
+                                {getBidderPosition(index)}
+                              </button>
+                            </span>
+                            {bidder.user_fullname} - {bidder.max_amount}
+                          </div>
+                        {/each}
+                      </td>
+                      <td
+                        class={entry.current_status === 'sold' ? 'tada black sold' : 'tada black unSold'}>
                         <div
-                          style="padding: 1px; font-size: {index === 0 ? '14px' : '11px'}">
-                          <span>
-                            <button
-                              class="btn btn-primary btn-xs small-button {index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze'}">
-                              {getBidderPosition(index)}
-                            </button>
-                          </span>
-                          {bidder.user_fullname} - {bidder.max_amount}
+                          id={'bid-count-' + entry.lot_index}
+                          class="animated">
+                          {entry.bid_count}
                         </div>
-                      {/each}
-                    </td>
-                    <td class="tada black">
-                      <div id={'bid-count-' + entry.lot_index} class="animated">
-                        {entry.bid_count}
-                      </div>
-                    </td>
-                    <td>
-                      {#if entry.status !== 'X'}
-                        {getCountDownTime(Number(entry.end_time) - serverTime)}
-                      {/if}
-                    </td>
-                    <td
-                      style="font-weight: bold;color: {entry.status === 'S' || entry.status === 'X' ? 'red' : 'blue'}">
-                      {getStatusName(entry.status)}
-                    </td>
-                    <td>
-                      {#if entry.bid_count > 0}
-                        <button
-                          class="btn btn-primary btn-xs"
-                          on:click={showPopup(entry._id)}>
-                          History
-                        </button>
-                      {:else}
-                        <button class="btn btn-primary btn-xs" disabled>
-                          History
-                        </button>
-                      {/if}
-                      <!-- <button
+                      </td>
+                      <td
+                        class={entry.current_status === 'sold' ? 'sold' : 'unSold'}>
+                        {#if entry.status !== 'X'}
+                          {getCountDownTime(Number(entry.end_time) - serverTime)}
+                        {/if}
+                      </td>
+                      <td
+                        class={entry.current_status === 'sold' ? 'sold' : 'unSold'}
+                        style="font-weight: bold;color: {entry.status === 'S' || entry.status === 'X' ? 'red' : 'blue'}">
+                        {getStatusName(entry.status)}
+                      </td>
+                      <td
+                        class={entry.current_status === 'sold' ? 'sold' : 'unSold'}>
+                        {#if entry.bid_count > 0}
+                          <button
+                            class="btn btn-primary btn-xs"
+                            on:click={showPopup(entry._id)}>
+                            History
+                          </button>
+                        {:else}
+                          <button class="btn btn-primary btn-xs" disabled>
+                            History
+                          </button>
+                        {/if}
+                        <!-- <button
                         class="btn btn-warning btn-xs"
                         on:click={buttonClick(entry.lot_index)}>
                         Effect
                       </button> -->
-                    </td>
-                  </tr>
+                      </td>
+                    </tr>
+                  {/if}
                 {/each}
               </tbody>
             </table>
