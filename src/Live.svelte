@@ -41,6 +41,7 @@
 
   //sales statics
   let totalProfit = 0;
+  let commissionProfit = 0;
   let soldLots = [];
   let unSoldLots = [];
   let withdrawnLots = [];
@@ -338,10 +339,27 @@
       return sum + entry.current_price;
     }, 0);
 
+    const commisionLots = soldLots.filter(function(entry) {
+      if (entry.is_reserve !== true) {
+        //unreserve case
+        return entry.current_price >= 5000;
+      } else {
+        //reserve met cases
+        return true;
+      }
+    });
+
+    commissionProfit =
+      0.05 *
+      commisionLots.reduce(function(sum, entry) {
+        return sum + entry.current_price;
+      }, 0);
+
     console.log("soldLots : ", soldLots);
     console.log("unSoldLots : ", unSoldLots);
     console.log("withdrawnLots : ", withdrawnLots);
     console.log("totalProfit : ", totalProfit);
+    console.log("commissionProfit : ", commissionProfit);
   }
 
   async function showPopup(entryId) {
@@ -800,6 +818,9 @@
     background-color: #f76d6a;
     color: white;
   }
+  .price-mark {
+    color: #3968c6;
+  }
 </style>
 
 <div>
@@ -812,6 +833,7 @@
         <div class="panel panel-default">
           <Statics
             {totalProfit}
+            {commissionProfit}
             allLots={entries.length}
             soldLots={soldLots.length}
             unSoldLots={unSoldLots.length}
@@ -865,6 +887,7 @@
                   <td>Max Price</td>
                   <td>Reserve Price</td>
                   <td class="left-align">Highest bidders</td>
+                  <td class="left-align">Vendor</td>
                   <td>Bids</td>
                   <td>Time</td>
                   <td>Status</td>
@@ -883,13 +906,18 @@
                       </td>
                       <td
                         class={entry.current_status === 'sold' ? 'tada black sold' : 'tada black unSold'}>
-                        <div id={'price-' + entry.lot_index} class="animated">
+                        <div
+                          id={'price-' + entry.lot_index}
+                          class={entry.current_price === entry.max_price ? 'animated' : 'animated price-mark'}>
                           {entry.current_price}
                         </div>
                       </td>
                       <td
                         class={entry.current_status === 'sold' ? 'sold' : 'unSold'}>
-                        {entry.max_price}
+                        <div
+                          class={entry.current_price === entry.max_price ? '' : 'price-mark'}>
+                          {entry.max_price}
+                        </div>
                       </td>
                       <td
                         class={entry.current_status === 'sold' ? 'sold' : 'unSold'}>
@@ -918,6 +946,13 @@
                             {bidder.user_fullname} - {bidder.max_amount}
                           </div>
                         {/each}
+                      </td>
+                      <td
+                        class={entry.current_status === 'sold' ? 'left-align sold' : 'left-align unSold'}>
+                        <div>
+                          {entry.vendor.name.firstname}
+                          {entry.vendor.name.surname}
+                        </div>
                       </td>
                       <td
                         class={entry.current_status === 'sold' ? 'tada black sold' : 'tada black unSold'}>

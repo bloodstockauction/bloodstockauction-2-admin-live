@@ -1,5 +1,6 @@
 <script>
   export let totalProfit;
+  export let commissionProfit;
   export let allLots;
   export let soldLots;
   export let unSoldLots;
@@ -32,22 +33,32 @@
   .statics-column {
     width: 20%;
   }
-  .statics-column .statics-container {
+  .statics-wide-column {
+    width: 26%;
+  }
+  .statics-small-column {
+    width: 17%;
+  }
+  .statics-column .statics-container,
+  .statics-wide-column .statics-container,
+  .statics-small-column .statics-container {
     margin: 5px;
   }
 </style>
 
 <div>
   <div class="row row-bg">
-    <div class="statics-column">
+    <div class="statics-wide-column">
       <div class="statics-container">
         <div class="statbox widget box box-shadow">
           <div class="widget-content">
             <div class="visual green">
               <i class="fa fa-usd fa-2x" />
             </div>
-            <div class="title">Total Sales</div>
-            <div class="value">${addCommas(totalProfit)}</div>
+            <div class="title">Total (commission) Sales</div>
+            <div class="value">
+              ${addCommas(totalProfit)} ( ${addCommas(commissionProfit)} )
+            </div>
           </div>
         </div>
       </div>
@@ -88,7 +99,7 @@
         </div>
       </div>
     </div>
-    <div class="statics-column">
+    <div class="statics-small-column">
       <div class="statics-container">
         <div class="statbox widget box box-shadow">
           <div class="widget-content">
@@ -106,7 +117,7 @@
         </div>
       </div>
     </div>
-    <div class="statics-column">
+    <div class="statics-small-column">
       <div class="statics-container">
         <div class="statbox widget box box-shadow">
           <div class="widget-content">
