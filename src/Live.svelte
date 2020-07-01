@@ -876,6 +876,13 @@
                   Sold
                 </a>
               </li>
+              <li class="nav-item">
+                <a
+                  class={filterType === 'max' ? 'nav-link active' : 'nav-link'}
+                  on:click={() => setFilter('max')}>
+                  Max
+                </a>
+              </li>
             </ul>
           </div>
           <div class="panel-body">
@@ -896,7 +903,7 @@
               </thead>
               <tbody>
                 {#each entries as entry}
-                  {#if filterType === 'all' || entry.current_status === filterType}
+                  {#if filterType === 'all' || (filterType !== 'max' && entry.current_status === filterType) || (filterType === 'max' && entry.current_price !== entry.max_price)}
                     <tr
                       id={'lot' + entry.lot_index}
                       class={entry.status === 'X' ? 'strikeout' : ''}>
