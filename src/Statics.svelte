@@ -34,10 +34,10 @@
     width: 20%;
   }
   .statics-wide-column {
-    width: 26%;
+    width: 24%;
   }
   .statics-small-column {
-    width: 17%;
+    width: 18%;
   }
   .statics-column .statics-container,
   .statics-wide-column .statics-container,
@@ -57,7 +57,10 @@
             </div>
             <div class="title">Total (commission) Sales</div>
             <div class="value">
-              ${addCommas(totalProfit)} ( ${addCommas(commissionProfit)} )
+              ${addCommas(totalProfit)}
+              <small style="font-size: 10px;">
+                (${addCommas(commissionProfit)})
+              </small>
             </div>
           </div>
         </div>
