@@ -276,13 +276,13 @@
         // console.log("highestBidderList : ", highestBidderList);
 
         entry.highestBidderList = highestBidderList;
-
-        setCurrentStatus(entry);
       } else {
         entry.max_price = 500;
         entry.highestUserName = "";
         entry.highestBidderList = [];
       }
+
+      setCurrentStatus(entry);
     }
 
     //init sales static
@@ -633,11 +633,13 @@
       if (entry.reserve_price <= entry.current_price) {
         entry.current_status = "sold";
       } else {
-        entry.current_status = "unSold";
+        entry.current_status = "unSoldReserve";
       }
     } else {
       if (entry.bid_count > 0) {
         entry.current_status = "sold";
+      } else {
+        entry.current_status = "unSoldUnreserve";
       }
     }
   }
@@ -865,8 +867,15 @@
               <li class="nav-item">
                 <a
                   class={filterType === 'unSold' ? 'nav-link active' : 'nav-link'}
-                  on:click={() => setFilter('unSold')}>
-                  Unsold
+                  on:click={() => setFilter('unSoldUnreserve')}>
+                  Unsold(UnReserve)
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class={filterType === 'unSold' ? 'nav-link active' : 'nav-link'}
+                  on:click={() => setFilter('unSoldReserve')}>
+                  Unsold(Reserve)
                 </a>
               </li>
               <li class="nav-item">
