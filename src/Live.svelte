@@ -49,6 +49,10 @@
   //filtering
   let filterType = "all";
 
+  //sleep and wakeup check
+  let TIMEOUT = 20000;
+  let lastSync = new Date().getTime();
+
   onMount(async () => {
     console.log("onMount is called");
 
@@ -103,6 +107,9 @@
           if (catalogueId) {
             getEntries(catalogueId);
           }
+
+          //set Sync
+          initSync();
         }
       } catch (error) {
         console.log(error);
@@ -648,6 +655,43 @@
     console.log("setFilter is called : ", Type);
     filterType = Type;
     console.log("new filter type : ", filterType);
+  }
+
+  function initSync() {
+    setInterval(function() {
+      var currentTime = new Date().getTime();
+      if (currentTime > lastSync + TIMEOUT + 2000) {
+        // Wake!
+        console.log("WAKE UP NOW");
+
+        //check JWT authentication
+        const idToken = localStorage.getItem(AUTH_ID);
+        console.log("idToken : ", idToken);
+        if (!idToken) {
+          return navigate("/login", { replace: true });
+        } else {
+          const decoded = jwtDecode(idToken);
+          console.log("idToken decoded : ", decoded);
+
+          if (decoded.role !== "admin") {
+            return navigate("/login", { replace: true });
+          }
+
+          const isExpired = isTokenExpired(idToken);
+          console.log("idToken expired : ", isTokenExpired(idToken));
+          if (isExpired === true) {
+            localStorage.removeItem(AUTH_ID);
+            return navigate("/login", { replace: true });
+          } else {
+            //refresh all entries data
+            refreshAllEntries();
+          }
+        }
+      } else {
+        console.log("NOT SLEEP YET");
+      }
+      lastSync = currentTime;
+    }, TIMEOUT);
   }
 </script>
 
