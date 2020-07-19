@@ -284,7 +284,7 @@
 
         entry.highestBidderList = highestBidderList;
       } else {
-        entry.max_price = 500;
+        entry.max_price = 900;
         entry.highestUserName = "";
         entry.highestBidderList = [];
       }
@@ -333,7 +333,7 @@
             unSoldLots.push(entry);
           }
         } else {
-          if (entry.current_price > 500 || entry.status === "S") {
+          if (entry.current_price > 900 || entry.status === "S") {
             soldLots.push(entry);
           } else {
             unSoldLots.push(entry);
