@@ -2,17 +2,19 @@
   import { onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import AuthService from "./service/auth";
+  import Config from "./environments/config";
 
   let email = "";
   let password = "";
   let result;
   let errorMessage;
+  const AUTH_ID = Config.AUTH_ID;
 
   onMount(async () => {
     console.log("onMount is called");
 
     //check authentication
-    const idToken = localStorage.getItem("bloodstockauction_admin_id_token");
+    const idToken = localStorage.getItem(AUTH_ID);
     console.log("idToken : ", idToken);
     if (idToken) {
       return navigate("/live", { replace: true });
@@ -41,7 +43,7 @@
       }
 
       if (authResult.role === "admin") {
-        localStorage.setItem("bloodstockauction_admin_id_token", token);
+        localStorage.setItem(AUTH_ID, token);
         navigate("/live", { replace: true });
       } else {
         errorMessage = "You are not permited.";
