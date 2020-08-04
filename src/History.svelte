@@ -1,5 +1,5 @@
 <script>
-  export let newliveHistory;
+  export let allHistories;
   import { onMount } from "svelte";
   import moment from "moment";
   import { createEventDispatcher } from "svelte";
@@ -12,29 +12,16 @@
     });
   }
 
-  let allHistories = [];
+  // let allHistories = [];
   let liveHistories = [];
   let maxHistories = 5;
 
   $: {
-    if (newliveHistory) {
-      console.log("liveHistories changed", newliveHistory);
-      allHistories.push(newliveHistory);
-
-      //save maximum 10 bidding logs
-      while (allHistories && allHistories.length > 10) {
-        allHistories.shift();
-      }
+    if (allHistories && allHistories.length > maxHistories) {
+      liveHistories = allHistories.slice(0, maxHistories);
+    } else {
+      liveHistories = allHistories;
     }
-
-    liveHistories = [...allHistories];
-
-    //set max live logs for user's setting'
-    while (liveHistories && liveHistories.length > maxHistories) {
-      liveHistories.shift();
-    }
-    console.log("liveHistories : ", liveHistories);
-    newliveHistory = undefined;
   }
 
   let isShowHistory = false;
@@ -118,9 +105,7 @@
         {#if liveHistories && liveHistories.length > 0}
           {#each liveHistories as history}
             <div class="history-rows">
-              Lot#{history.lot} - {history.prev_price}
-              <i class="fa fa-arrow-right" aria-hidden="true" />
-              {history.current_price} ( {moment(history.date).format('DD/MM/YYYY - h:mm a')}
+              Lot#{history.lot} - {history.current_price} ( {moment(history.date).format('DD/MM/YYYY - h:mm a')}
               )
               <button
                 class="btn btn-success btn-xs"
