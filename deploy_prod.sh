@@ -15,4 +15,4 @@ aws s3 rm s3://bloodstockauction2-us-admin-live/ --recursive
 aws s3 sync ./public/ s3://bloodstockauction2-us-admin-live/
 
 #invalidation for new Web resources
-# aws cloudfront create-invalidation --distribution-id E2VPVRY6G8PIEO --paths "/*"
+aws cloudfront create-invalidation --distribution-id EDK6UWLAZK2I3 --paths "/*"
