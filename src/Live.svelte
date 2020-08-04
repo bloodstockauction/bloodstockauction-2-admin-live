@@ -34,7 +34,7 @@
   let closed = false;
 
   //live history
-  let liveHistory;
+  let allLiveHistories = [];
 
   //window scroll
   let showTopButton = false;
@@ -194,7 +194,7 @@
               //update live history
               const newLiveHistory = {
                 lot: lotIndex,
-                prev_price: entries[entryIndex].current_price,
+                // prev_price: entries[entryIndex].current_price,
                 current_price: newEntry.current_price,
                 date: new Date()
               };
@@ -294,6 +294,9 @@
 
     //init sales static
     initSalesStatics(entries);
+
+    //init Live Bidding Logs
+    initLiveBiddingLogs(entries);
   }
 
   function getUnique(arr, comp) {
@@ -367,6 +370,41 @@
     console.log("withdrawnLots : ", withdrawnLots);
     console.log("totalProfit : ", totalProfit);
     console.log("commissionProfit : ", commissionProfit);
+  }
+
+  function initLiveBiddingLogs(allEntries) {
+    console.log("initLiveBiddingLogs is called : ", allEntries);
+    let allLiveBiddingLogs = [];
+
+    for (let index = 0; index < allEntries.length; index++) {
+      const entry = allEntries[index];
+      // console.log("initLiveBiddingLogs entry : ", entry);
+
+      if (entry.bid_count > 0) {
+        // console.log("initLiveBiddingLogs bid_count > 0 : ", entry);
+        for (let bidIndex = 0; bidIndex < entry.bids.length; bidIndex++) {
+          const bidHistory = entry.bids[bidIndex];
+          // console.log("initLiveBiddingLogs bidHistory : ", bidHistory);
+
+          const liveBiddingLog = {
+            lot: entry.lot_index,
+            current_price: bidHistory.amount,
+            date: Number(bidHistory.date)
+          };
+          // console.log("liveBiddingLog : ", liveBiddingLog);
+          allLiveBiddingLogs.push(liveBiddingLog);
+        }
+      }
+    }
+
+    // console.log("allLiveBiddingLogs : ", allLiveBiddingLogs);
+
+    allLiveBiddingLogs.sort((a, b) => (a.date < b.date ? 1 : -1));
+
+    allLiveBiddingLogs = allLiveBiddingLogs.slice(0, 10);
+    console.log("allLiveBiddingLogs sorted : ", allLiveBiddingLogs);
+
+    allLiveHistories = allLiveBiddingLogs;
   }
 
   async function showPopup(entryId) {
@@ -585,9 +623,16 @@
     audio.play();
   }
 
-  function addLiveHistory(newEntry) {
-    console.log("addLiveHistory called : ", newEntry);
-    liveHistory = newEntry;
+  function addLiveHistory(newBiddingHistory) {
+    console.log("addLiveHistory called : ", newBiddingHistory);
+
+    allLiveHistories.unshift(newBiddingHistory);
+    allLiveHistories.slice(0, 10);
+
+    console.log("addLiveHistory allLiveHistories : ", allLiveHistories);
+
+    //to emit update event in History module : forcely asign value
+    allLiveHistories = allLiveHistories;
   }
 
   function scrollTo(event) {
@@ -634,7 +679,7 @@
   }
 
   function setCurrentStatus(entry) {
-    console.log("setCurrentStatus is called : ", entry);
+    // console.log("setCurrentStatus is called : ", entry);
 
     if (entry.is_reserve) {
       if (entry.reserve_price <= entry.current_price) {
@@ -871,7 +916,7 @@
 
 <div>
   {#if entries && entries.length > 0}
-    <History newliveHistory={liveHistory} on:message={scrollTo} />
+    <History allHistories={allLiveHistories} on:message={scrollTo} />
   {/if}
   <div class="container">
     {#if entries && entries.length > 0}
