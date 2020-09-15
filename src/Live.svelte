@@ -988,6 +988,7 @@
               <thead>
                 <tr>
                   <td>Lot</td>
+                  <td>Name</td>
                   <td>Price</td>
                   <td>Max Price</td>
                   <td>Reserve Price</td>
@@ -1008,6 +1009,12 @@
                       <td
                         class={entry.current_status === 'sold' ? 'sold' : 'unSold'}>
                         {entry.lot_index}
+                      </td>
+                      <td
+                        class={entry.current_status === 'sold' ? 'sold' : 'unSold'}>
+                        {#if entry.horse.name.indexOf('Unnamed') > -1}
+                          {entry.horse.name} ({entry.horse.sire})
+                        {:else}{entry.horse.name}{/if}
                       </td>
                       <td
                         class={entry.current_status === 'sold' ? 'tada black sold' : 'tada black unSold'}>
