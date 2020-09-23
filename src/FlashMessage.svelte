@@ -72,11 +72,11 @@
   {#if biddingMessage}
     <div class="flashmessage">
       <div class="message">
-        Bidding result :
+        Bidding results :
         {#if success}
-          <span>{biddingMessage}</span>
+          <span>SUCCESS. {biddingMessage}</span>
         {:else}
-          <span class="red">{biddingMessage}</span>
+          <span class="red">FAILED. {biddingMessage}</span>
         {/if}
       </div>
     </div>

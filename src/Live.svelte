@@ -815,6 +815,14 @@
 
   const showDialog = (lotIndex, entryId) => {
     console.log("showDialog is called : ", lotIndex, entryId);
+
+    const isExpired = isTokenExpired(authToken);
+    console.log("idToken expired : ", isTokenExpired(authToken));
+    if (isExpired === true) {
+      localStorage.removeItem(AUTH_ID);
+      return navigate("/login", { replace: true });
+    }
+
     open(
       BidPopup,
       {
