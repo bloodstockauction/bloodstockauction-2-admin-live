@@ -9,7 +9,9 @@
   import Popup from "./Popup.svelte";
   import Config from "./environments/config";
   import History from "./History.svelte";
+  import FlashMessage from "./FlashMessage.svelte";
   import Statics from "./Statics.svelte";
+  import BidPopup from "./BidPopup.svelte";
 
   //service
   import EntryService from "./service/entries";
@@ -22,6 +24,7 @@
   let entries = [];
   let serverTime = 0;
   let ioClient;
+  let socketId;
   let authToken;
   let catalogueId;
   let catalogueEntries;
@@ -52,6 +55,11 @@
   //sleep and wakeup check
   let TIMEOUT = 20000;
   let lastSync = new Date().getTime();
+
+  //bidding popup
+  let biddingLotIndex;
+  let biddingMessage;
+  let biddingSuccess;
 
   onMount(async () => {
     console.log("onMount is called");
@@ -146,10 +154,20 @@
       console.log("socket is openning");
       ioClient = io.connect(SOCKET_END_POINT);
 
+      ioClient.on("connect", () => {
+        socketId = ioClient.id;
+        console.log("socketId : ", socketId);
+      });
+
       ioClient.on("auction", msg => {
         // console.info(msg);
 
-        if (msg.type === "all") {
+        if (msg.type === "bid") {
+          //get result for user biddings
+          console.log("bid result: ", msg.data);
+          biddingMessage = `Lot #${biddingLotIndex} - ` + msg.data.message;
+          biddingSuccess = msg.data.result === "success" ? true : false;
+        } else if (msg.type === "all") {
           serverTime = msg.data.time;
           const newEntries = msg.data.lots;
 
@@ -738,6 +756,88 @@
       lastSync = currentTime;
     }, TIMEOUT);
   }
+
+  function bid(entryId, lotIndex, price) {
+    console.log("bid is called : ", entryId, lotIndex, price);
+
+    //remove bidding result messages
+    biddingLotIndex = undefined;
+    biddingMessage = "";
+
+    //auth Token check
+    const decoded = jwtDecode(authToken);
+    console.log("authToken decoded : ", decoded);
+
+    if (decoded.role !== "admin") {
+      localStorage.removeItem(AUTH_ID);
+      return navigate("/login", { replace: true });
+    }
+
+    if (!decoded.username || !decoded.full_name) {
+      localStorage.removeItem(AUTH_ID);
+      return navigate("/login", { replace: true });
+    }
+
+    const isExpired = isTokenExpired(authToken);
+    console.log("authToken expired : ", isTokenExpired(authToken));
+    if (isExpired === true) {
+      localStorage.removeItem(AUTH_ID);
+      return navigate("/login", { replace: true });
+    }
+
+    let bidData = {
+      id: socketId,
+      entryId: entryId,
+      token: authToken,
+      username: decoded.username,
+      user_fullname: decoded.full_name,
+      price: price
+    };
+
+    console.log("bidData : ", bidData);
+    biddingLotIndex = lotIndex;
+    ioClient.emit("bid", bidData);
+  }
+
+  let biddingPrice;
+
+  const onCancel = price => {
+    biddingPrice = 0;
+  };
+
+  const onConfirm = (entryId, lotIndex, price) => {
+    biddingPrice = price;
+    console.log("onConfirm is called : ", entryId, lotIndex, biddingPrice);
+
+    //call bid function
+    bid(entryId, lotIndex, price);
+  };
+
+  const showDialog = (lotIndex, entryId) => {
+    console.log("showDialog is called : ", lotIndex, entryId);
+
+    const isExpired = isTokenExpired(authToken);
+    console.log("idToken expired : ", isTokenExpired(authToken));
+    if (isExpired === true) {
+      localStorage.removeItem(AUTH_ID);
+      return navigate("/login", { replace: true });
+    }
+
+    open(
+      BidPopup,
+      {
+        lotIndex: lotIndex,
+        entryId: entryId,
+        onCancel,
+        onConfirm
+      },
+      {
+        closeButton: false,
+        closeOnEsc: false,
+        closeOnOuterClick: false
+      }
+    );
+  };
 </script>
 
 <style>
@@ -915,6 +1015,7 @@
 </style>
 
 <div>
+  <FlashMessage message={biddingMessage} success={biddingSuccess} />
   {#if entries && entries.length > 0}
     <History allHistories={allLiveHistories} on:message={scrollTo} />
   {/if}
@@ -1098,11 +1199,20 @@
                             History
                           </button>
                         {/if}
-                        <!-- <button
-                        class="btn btn-warning btn-xs"
-                        on:click={buttonClick(entry.lot_index)}>
-                        Effect
-                      </button> -->
+
+                        {#if socketId}
+                          <button
+                            class="btn btn-warning btn-xs"
+                            on:click={showDialog(entry.lot_index, entry._id)}
+                            disabled={entry.status !== 'A'}>
+                            Bid
+                          </button>
+                        {:else}
+                          <button class="btn btn-primary btn-xs" disabled>
+                            Bid
+                          </button>
+                        {/if}
+
                       </td>
                     </tr>
                   {/if}
