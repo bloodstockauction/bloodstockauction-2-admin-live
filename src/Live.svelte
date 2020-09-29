@@ -813,7 +813,7 @@
     bid(entryId, lotIndex, price);
   };
 
-  const showDialog = (lotIndex, entryId) => {
+  const showDialog = (lotIndex, entryId, currentPrice) => {
     console.log("showDialog is called : ", lotIndex, entryId);
 
     const isExpired = isTokenExpired(authToken);
@@ -828,6 +828,7 @@
       {
         lotIndex: lotIndex,
         entryId: entryId,
+        currentPrice: currentPrice,
         onCancel,
         onConfirm
       },
@@ -1203,7 +1204,7 @@
                         {#if socketId}
                           <button
                             class="btn btn-warning btn-xs"
-                            on:click={showDialog(entry.lot_index, entry._id)}
+                            on:click={showDialog(entry.lot_index, entry._id, entry.current_price)}
                             disabled={entry.status !== 'A'}>
                             Bid
                           </button>
