@@ -35,7 +35,7 @@
   }
 
   function isValidPrice(amount) {
-    if (amount >= 600) {
+    if (amount >= 500) {
       if (amount < 2000) {
         return amount % 100 === 0;
       } else if (amount < 20000) {
@@ -78,7 +78,7 @@
   function getNextBidIncrese(price) {
     // console.log("getNextBidPrice is called : ", price);
 
-    if (price >= 600 && price < 2000) {
+    if (price >= 500 && price < 2000) {
       return 100;
     } else if (price < 20000) {
       return 250;
