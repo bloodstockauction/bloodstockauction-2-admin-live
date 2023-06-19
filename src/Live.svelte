@@ -380,6 +380,11 @@
     commissionProfit =
       0.05 *
       commisionLots.reduce(function(sum, entry) {
+        // if(entry.is_complimentary){
+        //   return sum;
+        // }else{
+        //   return sum + entry.current_price;
+        // }
         return sum + entry.current_price;
       }, 0);
 
@@ -1099,6 +1104,7 @@
                   <td>Bids</td>
                   <td>Time</td>
                   <td>Status</td>
+                  <td>Package</td>
                   <td>Actions</td>
                 </tr>
               </thead>
@@ -1186,6 +1192,14 @@
                         class={entry.current_status === 'sold' ? 'sold' : 'unSold'}
                         style="font-weight: bold;color: {entry.status === 'S' || entry.status === 'X' ? 'red' : 'blue'}">
                         {getStatusName(entry.status)}
+                      </td>
+                      <td
+                        class={entry.current_status === 'sold' ? 'sold' : 'unSold'}>
+                        {#if entry.is_no_sales_no_fee === true}
+                          {entry.package + "(NSNF)"} 
+                        {:else}
+                          {entry.package}
+                        {/if}
                       </td>
                       <td
                         class={entry.current_status === 'sold' ? 'sold' : 'unSold'}>

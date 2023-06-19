@@ -34,6 +34,9 @@ const EntryService = {
                 lot_index
                 is_reserve
                 vendor { _id username phone email name { firstname surname}}
+                package
+                is_no_sales_no_fee
+                is_complimentary
               }
             }
           }`,
