@@ -367,15 +367,7 @@
       return sum + entry.current_price;
     }, 0);
 
-    const commisionLots = soldLots.filter(function(entry) {
-      if (entry.is_reserve !== true) {
-        //unreserve case
-        return entry.current_price >= 5000;
-      } else {
-        //reserve met cases
-        return true;
-      }
-    });
+    const commisionLots = soldLots; // changed to add all sold listings
 
     commissionProfit =
       0.05 *
@@ -1055,6 +1047,7 @@
             <ul class="nav nav-tabs justify-content-end">
               <li class="nav-item">
                 <a
+                  href="#top"
                   class={filterType === 'all' ? 'nav-link active' : 'nav-link'}
                   on:click={() => setFilter('all')}>
                   All
@@ -1062,6 +1055,7 @@
               </li>
               <li class="nav-item">
                 <a
+                  href="#top"
                   class={filterType === 'unSold' ? 'nav-link active' : 'nav-link'}
                   on:click={() => setFilter('unSoldUnreserve')}>
                   Unsold(UnReserve)
@@ -1069,6 +1063,7 @@
               </li>
               <li class="nav-item">
                 <a
+                  href="#top"
                   class={filterType === 'unSold' ? 'nav-link active' : 'nav-link'}
                   on:click={() => setFilter('unSoldReserve')}>
                   Unsold(Reserve)
@@ -1076,6 +1071,7 @@
               </li>
               <li class="nav-item">
                 <a
+                  href="#top"
                   class={filterType === 'sold' ? 'nav-link active' : 'nav-link'}
                   on:click={() => setFilter('sold')}>
                   Sold
@@ -1083,6 +1079,7 @@
               </li>
               <li class="nav-item">
                 <a
+                  href="#top"
                   class={filterType === 'max' ? 'nav-link active' : 'nav-link'}
                   on:click={() => setFilter('max')}>
                   Max
@@ -1247,6 +1244,7 @@
 
     {#if showTopButton}
       <a
+        href="#top"
         role="button"
         class="cd-top cd-is-visible"
         on:click={scrollToTop}
