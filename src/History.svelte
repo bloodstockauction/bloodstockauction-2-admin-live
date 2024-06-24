@@ -117,7 +117,9 @@
         </span>
         )
         <div class="float-right">
-          <a on:click={setShowHistory}>
+          <a 
+            href="#top"
+            on:click={setShowHistory}>
             <i class="fa fa-arrow-circle-up fa-lg" />
           </a>
         </div>
@@ -142,7 +144,9 @@
       <div class="history-title">
         LIVE Bidding Logs
         <div class="float-right">
-          <a on:click={setShowHistory}>
+          <a 
+            href="#top"
+            on:click={setShowHistory}>
             <i class="fa fa-arrow-circle-down fa-lg" />
           </a>
         </div>
