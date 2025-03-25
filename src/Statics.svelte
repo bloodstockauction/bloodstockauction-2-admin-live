@@ -77,7 +77,7 @@
             <div class="value">
               {soldLots} lots
               <small style="font-size: 10px;">
-                ({((soldLots / allLots) * 100).toFixed(1)}%)
+                ({((soldLots / (allLots - withdrawnLots)) * 100).toFixed(1)}%)
               </small>
             </div>
           </div>
@@ -95,7 +95,7 @@
             <div class="value">
               {unSoldLots} lots
               <small style="font-size: 10px;">
-                ({((unSoldLots / allLots) * 100).toFixed(1)}%)
+                ({((unSoldLots / (allLots - withdrawnLots)) * 100).toFixed(1)}%)
               </small>
             </div>
           </div>
@@ -112,9 +112,6 @@
             <div class="title">Withdrawn</div>
             <div class="value">
               {withdrawnLots} lots
-              <small style="font-size: 10px;">
-                ({((withdrawnLots / allLots) * 100).toFixed(1)}%)
-              </small>
             </div>
           </div>
         </div>
@@ -127,8 +124,8 @@
             <div class="visual blue">
               <i class="fa fa-bar-chart fa-2x" />
             </div>
-            <div class="title">Total</div>
-            <div class="value">{allLots} lots</div>
+            <div class="title">Total ( Except Withdrawn )</div>
+            <div class="value">{allLots} ({allLots - withdrawnLots}) lots</div>
           </div>
         </div>
       </div>
