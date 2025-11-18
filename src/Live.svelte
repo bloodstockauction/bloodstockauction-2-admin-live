@@ -1160,7 +1160,10 @@
                                 {getBidderPosition(index)}
                               </button>
                             </span>
-                            {bidder.user_fullname} - {bidder.max_amount}
+                            <a href={"https://admin.bloodstockauction.com/members/" + bidder.user} target="_blank" rel="noopener noreferrer">
+                              {bidder.user_fullname}
+                            </a>
+                            - {bidder.max_amount}
                           </div>
                         {/each}
                       </td>
