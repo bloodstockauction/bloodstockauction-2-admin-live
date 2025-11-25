@@ -1008,7 +1008,7 @@
     color: white;
   }
   .price-mark {
-    color: #3968c6;
+    color: #fe6600;
   }
 </style>
 
