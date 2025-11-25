@@ -1008,7 +1008,7 @@
     color: white;
   }
   .price-mark {
-    color: #fe6600;
+    color: #3968c6;
   }
 </style>
 
@@ -1160,7 +1160,7 @@
                                 {getBidderPosition(index)}
                               </button>
                             </span>
-                            <a href={"https://admin.bloodstockauction.com/members/" + bidder.user} target="_blank" rel="noopener noreferrer">
+                            <a href={"https://admin.bloodstockauction.com/members/" + bidder.user} style="color: inherit; text-decoration: none;" target="_blank" rel="noopener noreferrer">
                               {bidder.user_fullname}
                             </a>
                             - {bidder.max_amount}
