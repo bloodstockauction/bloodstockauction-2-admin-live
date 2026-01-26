@@ -282,6 +282,23 @@
   }
 
   function initEntries(entries) {
+    
+    const validStatuses = ["X", "P", "A", "S"];
+
+    for (let i = entries.length - 1; i >= 0; i--) {
+      const entry = entries[i];
+
+      const hasValidStatus = validStatuses.includes(entry.status);
+      const hasLotIndex =
+        entry.lot_index !== undefined &&
+        entry.lot_index !== null &&
+        entry.lot_index !== "";
+
+      if (!hasValidStatus || !hasLotIndex) {
+        entries.splice(i, 1);
+      }
+    }
+
     for (let index = 0; index < entries.length; index++) {
       const entry = entries[index];
       if (entry.bid_count > 0) {
