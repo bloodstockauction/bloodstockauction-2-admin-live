@@ -1027,6 +1027,20 @@
   .price-mark {
     color: #3968c6;
   }
+  .member-link {
+    color: #1565c0;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .member-link:hover {
+    color: #0d47a1;
+  }
+  .unSold .member-link {
+    color: #e3f2fd;
+  }
+  .unSold .member-link:hover {
+    color: #fff;
+  }
 </style>
 
 <div>
@@ -1177,7 +1191,11 @@
                                 {getBidderPosition(index)}
                               </button>
                             </span>
-                            <a href={"https://admin.bloodstockauction.com/members/" + bidder.user} style="color: inherit; text-decoration: none;" target="_blank" rel="noopener noreferrer">
+                            <a
+                              class="member-link"
+                              href={"https://admin.bloodstockauction.com/members/" + bidder.user}
+                              target="_blank"
+                              rel="noopener noreferrer">
                               {bidder.user_fullname}
                             </a>
                             - {bidder.max_amount}

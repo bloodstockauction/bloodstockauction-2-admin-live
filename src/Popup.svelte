@@ -13,6 +13,14 @@
     background-color: #326fa8;
     font-weight: bold;
   }
+  .member-link {
+    color: #1565c0;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .member-link:hover {
+    color: #0d47a1;
+  }
 </style>
 
 <div class="center">
@@ -29,7 +37,14 @@
       {#each bids as bid}
         <tr>
           <td>
-            {bid.user_fullname} (bidder {bid.bidder})
+            <a
+              class="member-link"
+              href={"https://admin.bloodstockauction.com/members/" + bid.user}
+              target="_blank"
+              rel="noopener noreferrer">
+              {bid.user_fullname}
+            </a>
+            (bidder {bid.bidder})
             {#if bid.status}
               <span style="color: red;">- ( {bid.status} )</span>
             {/if}
