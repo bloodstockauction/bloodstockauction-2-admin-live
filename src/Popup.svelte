@@ -13,13 +13,14 @@
     background-color: #326fa8;
     font-weight: bold;
   }
-  .member-link {
-    color: #1565c0;
+  .member-link,
+  .member-link:visited {
+    color: #000;
     text-decoration: underline;
     cursor: pointer;
   }
   .member-link:hover {
-    color: #0d47a1;
+    color: #333;
   }
 </style>
 

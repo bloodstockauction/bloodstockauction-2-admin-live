@@ -1027,19 +1027,21 @@
   .price-mark {
     color: #3968c6;
   }
-  .member-link {
-    color: #1565c0;
+  .member-link,
+  .member-link:visited {
+    color: #000;
     text-decoration: underline;
     cursor: pointer;
   }
   .member-link:hover {
-    color: #0d47a1;
+    color: #333;
   }
-  .unSold .member-link {
-    color: #e3f2fd;
+  .unSold .member-link,
+  .unSold .member-link:visited {
+    color: inherit;
   }
   .unSold .member-link:hover {
-    color: #fff;
+    opacity: 0.85;
   }
 </style>
 
