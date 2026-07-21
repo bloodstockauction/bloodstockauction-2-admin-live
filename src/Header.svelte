@@ -1,5 +1,5 @@
 <script>
-  export const APP_VERSION = "1.0.3";
+  import { APP_VERSION } from "./app-version.js";
 </script>
 <style>
   .header {
